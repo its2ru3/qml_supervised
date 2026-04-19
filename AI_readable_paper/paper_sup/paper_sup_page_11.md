@@ -1,0 +1,23 @@
+IQP circuits. In fact it is known that if general real values $\phi_S(\boldsymbol{x})$ are allowed that $d = 2$ suffices to encode #P-hard problems in the output probability [10]. This hardness result, only applies to the case where the output probability can be approximated up to a multiplicative error. A noisy quantum computer, however, is also not able to provide a multiplicative error estimate to this quantity. Nevertheless, Bremner et al. show, contingent on additional complexity theoretic conjectures, that it is hard for a classical sampler to produce samples from the output distribution of the IQP circuit. Does this result imply some form of hardness for the feature map version of this circuit? The answer is unfortunately no. The kernel can be estimated up to an additive error of $\epsilon$ by drawing $R = \epsilon^{-2}$ samples from the uniform distribution over $n$ classical bits and averaging $\tilde{\Phi}_{\boldsymbol{x}-\boldsymbol{y}}(z) = \Phi_{\boldsymbol{x}}(z) \overline{\Phi}_{\boldsymbol{y}}(z)$, c.f. eqn. (33)
+
+$$|\langle 0^n | H^{\otimes n} U_{\Phi(\boldsymbol{y})} U_{\Phi(\boldsymbol{x})} H^{\otimes n} | 0^n \rangle|^2 = \left| \frac{1}{2^n} \sum_{z \in \{0,1\}^n} \tilde{\Phi}_{\boldsymbol{x}-\boldsymbol{y}}(z) \right|^2. \qquad (37)$$
+
+Since we have that the variance of the random variable is bounded by 1, i.e. $|\Phi_{\boldsymbol{x}}(z)|^2 = 1$ , we get an additive error that scales as $\mathcal{O}(\epsilon)$. This means for a single layer, the kernel can be estimated classically.
+
+#### **V. QUANTUM VARIATIONAL CLASSIFICATION**
+
+Following the structure of the feature map circuit, we construct the classifier part of the variational algorithm by appending layers of single-qubit unitaries and entangling gates Fig. 3.a. Each subsequent layer, or depth, contains an additional set of entanglers across all the qubits used for the algorithm. We use a coherently controllable quantum mechanical system, such as for example the superconducting chip with $n$ transmon qubits to prepare a short depth quantum circuit $W(\boldsymbol{\theta})$. In the experiment here, comprising $n = 2$ qubits, one controlled-phase gate is added per depth. The single-qubit unitaries used in the classifier are limited to $Y$ and $Z$ rotations to simplify the number of parameters to be handled by the classical optimizer. Our use of controlled-phase, rather than CNOT, gates for the entanglers is justified by our aim at increased generality in our software. Using controlled-phase gates does not require to particularize this part of the algorithm for different systems topologies. A specific entangling map for a given device can then be used by our compiler to translate each controlled-phase gate into the CNOTs available in our system.
+
+The general circuit is comprised of the following sequence of single qubit and multi-qubit gates:
+
+$$W(\boldsymbol{\theta}) = U_{\text{loc}}^{(l)}(\theta_l) \; U_{\text{ent}} \dots U_{\text{loc}}^{(2)}(\theta_2) \; U_{\text{ent}} \; U_{\text{loc}}^{(1)}(\theta_1). \qquad (38)$$
+
+We apply a circuit of $l$ repeated entanglers as depicted in Fig 3.b and interleave them with layers comprised of local single qubit rotations:
+
+$$U_{\text{loc}}^{(t)}(\theta_t) = \otimes_{m=1}^n U(\theta_{m,t}) \quad \text{and} \quad U(\theta_{m,t}) = e^{i \frac{1}{2} \theta_{m,t}^z Z_m} e^{i \frac{1}{2} \theta_{m,t}^y Y_m}, \qquad (39)$$
+
+parametrized by $\theta_t \in \mathbb{R}^{2n}$ and $\theta_{i,t} \in \mathbb{R}^2$. In principle, there exist multiple choices for the entangling unitaries $U_{\text{ent}}$ [11, 12]. For the feature map that we consider, however, we use the entangler that is comprised of products of control phase gates $\text{CZ}(i, j)$ between qubits $i$ and $j$. The entangling interactions follow the interaction graph that $G = (E, V)$ that was used to generate the feature map in eqn. (32).
+
+$$U_{\text{ent}} = \prod_{(i,j) \in E} \text{CZ}(i, j), \qquad (40)$$
+
+This short-depth circuit can generate any unitary if sufficiently many layers $d$ are applied. The circuit Fig. 3.a can be understood as a bang-bang controlled evolution of an Ising model Hamiltonian $H_0 = \sum_{(ij) \in E} J_{ij} Z_i Z_j$, c.f. Fig. 3.b, interspersed with single qubit control pulses in $SU(2)$ on every qubit. It is known that this set of drift steps together with all single control pulses are universal, so we have that any state can be prepared this way with sufficient circuit depth [13]. For a general unitary gate sequence the entangling unitary has to be effectively generated from cross resonance gates, by applying single qubit control pulses.
