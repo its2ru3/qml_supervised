@@ -13,3 +13,5 @@ Using marker-pdf --> converts pdf to markdown
 3. using pigar (best) -> gives only packages used in the project and ignores the ones installed in the environment
 > pigar generate
 
+
+
