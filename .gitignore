@@ -1,6 +1,4 @@
 # AI_readable_paper/
 # Elses/
 venv_qml_project/
-.git/
-helpers/__pycache__
-helpers_linux/__pycache__
+**/__pycache__/
